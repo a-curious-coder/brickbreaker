@@ -4,12 +4,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.TextView;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends Activity {
 
@@ -37,6 +41,7 @@ public class MainActivity extends Activity {
 
         this.startGame(mGameView, null, savedInstanceState);
     }
+
 
     private void startGame(GameView gView, GameThread gThread, Bundle savedInstanceState) {
 

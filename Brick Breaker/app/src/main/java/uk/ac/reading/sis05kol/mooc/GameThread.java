@@ -15,7 +15,10 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
 
-public abstract class GameThread extends Thread {
+import java.util.Timer;
+import java.util.TimerTask;
+
+public abstract class GameThread extends Thread	{
 	//Different mMode states
 	public static final int STATE_LOSE = 1;
 	public static final int STATE_PAUSE = 2;
@@ -28,13 +31,16 @@ public abstract class GameThread extends Thread {
 
 	//Control of the actual running inside run()
 	private boolean mRun = false;
+
+	private boolean start_flg = false;
+	private boolean action_flg = false;
 		
 	//The surface this thread (and only this thread) writes upon
 	private SurfaceHolder mSurfaceHolder;
 	
 	//the message handler to the View/Activity thread
 	private Handler mHandler;
-	
+
 	//Android Context - this stores almost all we need to know
 	private Context mContext;
 	
@@ -72,7 +78,7 @@ public abstract class GameThread extends Thread {
 		mContext = gameView.getContext();
 		
 		mBackgroundImage = BitmapFactory.decodeResource
-							(gameView.getContext().getResources(), 
+							(gameView.getContext().getResources(),
 							R.drawable.background);
 	}
 	
@@ -185,9 +191,12 @@ public abstract class GameThread extends Thread {
 		 
 		return false;
 	}
+
+
 	
 	protected void actionOnTouch(float x, float y) {
 		//Override to do something
+
 	}
 
 	//The Orientation has changed

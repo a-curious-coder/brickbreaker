@@ -20,10 +20,10 @@ This is my attempt at creating a brick breaker type game using Java in Android S
 
 #### Functionality
 
-- [ ] On screen menus
-- [ ] Scores
-- [ ] Controllable character / object
-- [ ] Sensor interaction (touch / accelerometer / etc)
+- [x] On screen menus
+- [x] Scores
+- [x] Controllable character / object
+- [x] Sensor interaction (touch / accelerometer / etc)
 
 Game has levels
 
@@ -77,4 +77,8 @@ User level creation
 References
 
 [Brick Breaker Guide](https://www.youtube.com/watch?v=K9qMm3JbOH0&t=193s) - Develop a Brick Breaker Game
+
+[Menu Background](https://codinginflow.com/tutorials/android/animated-gradient-background) - Develop menu background
+
+[Building your first mobile game](http://www.reading.ac.uk/dcs-begin-programming.aspx) - Helped to understand the foundation I'm working with
 
