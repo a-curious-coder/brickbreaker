@@ -2,25 +2,26 @@ package uk.ac.reading.sis05kol.mooc;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.support.constraint.solver.widgets.Rectangle;
 
 public class Sprite {
 
     // Image used to represent Sprite in the game
-    private Bitmap pImage;
+    private Bitmap sImage;
 
     // X and Y coordinates for Sprite's position
-    private float pY;
-    private float pX;
+    private float sY = -100;
+    private float sX = -100;
 
     // How fast the Sprite will move (pixels per second)
-    private float pSpeedX = 0;
-    private float pSpeedY = 0;
+    private float sSpeedX = 0;
+    private float sSpeedY = 0;
 
     // How big the Sprite is
-    private float pWidth = 0;
-    private float pHeight = 0;
-    private float pHalfWidth = 0;
-    private float pHalfHeight = 0;
+    private float sWidth = 0;
+    private float sHeight = 0;
+    private float sHalfWidth = 0;
+    private float sHalfHeight = 0;
 
     /**
      * Sprite class, default properties of every object of type Sprite
@@ -28,34 +29,24 @@ public class Sprite {
      */
     public Sprite (Bitmap image){
 
-        pImage = image;
-        pWidth= image.getWidth();
-        pHeight = image.getHeight();
-        pHalfWidth = pWidth / 2;
-        pHalfHeight = pHeight / 2;
+        sImage = image;
+        sWidth= image.getWidth();
+        sHeight = image.getHeight();
+        sHalfWidth = sWidth / 2;
+        sHalfHeight = sHeight / 2;
 
     }
 
-    public float getWidth() {
-        return this.pWidth;
-    }
+    public float getX()     { return this.sX; }
+    public float getY()     { return this.sY; }
+    public float getWidth() { return this.sWidth; }
+    public float getHeight(){ return this.sHeight; }
 
-    public float getHeight()    {
-        return this.pHeight;
-    }
-
-    public float getX() {
-        return this.pX;
-    }
-
-    public float getY() {
-        return this.pY;
-    }
-
-    public float getLeft() { return pX-pHalfWidth; }
-    public float getRight() { return pX+pHalfWidth; }
-    public float getTop() { return pY-pHalfHeight; }
-    public float getBottom() { return pY+pHalfHeight; }
+    // Frame/proportions of the object. E.g. the left side of object is the x coord minus half of the objects width.
+    public float getLeft()  { return sX-sHalfWidth; }
+    public float getRight() { return sX+sHalfWidth; }
+    public float getTop()   { return sY-sHalfHeight; }
+    public float getBottom(){ return sY+sHalfHeight; }
 
     public boolean contains(float x, float y) {
         return getLeft() <= x && x <= getRight() && getTop() <= y && y <= getBottom();
@@ -63,8 +54,8 @@ public class Sprite {
 
 
     public void setPosition(float x, float y) {
-        pX = x;
-        pY = y;
+        sX = x;
+        sY = y;
     }
 
     /**
@@ -74,28 +65,16 @@ public class Sprite {
     public void draw(Canvas canvas) {
         // drawBitmap uses top left corner as reference,
         // null means that we will use the image without any extra features (called Paint)
-        canvas.drawBitmap( pImage, getLeft(), getTop(), null);
+        canvas.drawBitmap( sImage, getLeft(), getTop(), null);
     }
-    
-    // Takes object and checks if objects overlap during runtime
-    public boolean topOverlap( Sprite s ) {
-        return getTop() <= s.getBottom() && getTop() >= s.getTop();
-    }
-    public boolean bottomOverlap( Sprite s ) {
-        return getBottom() >= s.getTop() && getBottom() <= s.getBottom();
-    }
-    public boolean leftOverlap( Sprite s ) {
-        return getLeft() >= s.getLeft() && getLeft() <= s.getRight();
-    }
-    public boolean rightOverlap( Sprite s ) {
-        return getRight() <= s.getRight() && getRight() >= s.getLeft();
-    }
-    public boolean widthOverlap( Sprite s ) {
-        return s.getLeft() <= getRight() && s.getRight() >= getLeft();
-    }
-    public boolean heightOverlap( Sprite s ) {
-        return s.getTop() <= getBottom() && s.getBottom() >= getTop();
-    }
+
+    // Takes object and checks if objects overlap eachother during runtime
+    public boolean topOverlaps( Sprite s ) { return getTop() <= s.getBottom() && getTop() >= s.getTop(); }
+    public boolean bottomOverlaps( Sprite s ) { return getBottom() >= s.getTop() && getBottom() <= s.getBottom(); }
+    public boolean leftOverlaps( Sprite s ) { return getLeft() >= s.getLeft() && getLeft() <= s.getRight(); }
+    public boolean rightOverlaps( Sprite s ) { return getRight() <= s.getRight() && getRight() >= s.getLeft(); }
+    public boolean widthOverlap( Sprite s ) { return s.getLeft() <= getRight() && s.getRight() >= getLeft(); }
+    public boolean heightOverlap( Sprite s ) { return s.getTop() <= getBottom() && s.getBottom() >= getTop(); }
 
     /**
      * Returns boolean using all functions above to whether objects are overlapping during runtime
@@ -103,12 +82,15 @@ public class Sprite {
      * @return
      */
     public boolean isOverlapping( Sprite s ) {
-        return ((topOverlap(s) || bottomOverlap(s)) && widthOverlap(s)) ||
-                ((leftOverlap(s) || rightOverlap(s)) && heightOverlap(s));
+        return ((topOverlaps(s) || bottomOverlaps(s)) && widthOverlap(s)) ||
+                ((leftOverlaps(s) || rightOverlaps(s)) && heightOverlap(s));
     }
 
-    // Get overlap sizes
-
+    // Once the overlap type is retrieved, get overlap size from these functions.
+    public float topOverlap( Sprite s ) { return s.getBottom() - getTop(); }
+    public float bottomOverlap( Sprite s ) { return getBottom() - s.getTop(); }
+    public float leftOverlap( Sprite s ) { return s.getRight() - getLeft(); }
+    public float rightOverlap( Sprite s ) { return getRight() - s.getLeft(); }
 
     /**
      * set and get speed/direction
@@ -116,44 +98,83 @@ public class Sprite {
      * @param dy    new speed y coord value
      */
     public void setSpeed( float dx, float dy ) {
-        pSpeedX = dx;
-        pSpeedY = dy;
+        sSpeedX = dx;
+        sSpeedY = dy;
     }
-    public float speedX() {
-        return pSpeedX;
-    }
-    public float speedY() {
-        return pSpeedY;
-    }
-    public boolean isMovingLeft() {
-        return pSpeedX < 0;
-    }
-    public boolean isMovingRight() {
-        return pSpeedX > 0;
-    }
-    public boolean isMovingDown() {
-        return pSpeedY > 0;
-    }
-    public boolean isMovingUp() {
-        return pSpeedY < 0;
-    }
-
+    public float getSpeedX() { return sSpeedX; }
+    public float getSpeedY() { return sSpeedY; }
+    public boolean isMovingLeft() { return sSpeedX < 0; }
+    public boolean isMovingRight() { return sSpeedX > 0; }
+    public boolean isMovingDown() { return sSpeedY > 0; }
+    public boolean isMovingUp() { return sSpeedY < 0; }
+    public float getSpeed() { return (float) Math.sqrt((sSpeedX*sSpeedX)+(sSpeedY * sSpeedY)); }
     // Move object opposite direction it was going toward
-    public void moveX() {
-        pSpeedX = -pSpeedX;
-    }
-    public void moveY() {
-        pSpeedY = -pSpeedY;
-    }
+    public void moveX() { sSpeedX = -sSpeedX; }
+    public void moveY() { sSpeedY = -sSpeedY; }
 
     /**
-     * Updates position of bject accroding to current speed and time elapsed
+     * Updates position of object according to current speed and time elapsed
      * @param secondsElapsed    seconds elapsed during runtime
      */
     public void move(float secondsElapsed) {
-        pX = pX + secondsElapsed * pSpeedX;
-        pY = pY + secondsElapsed * pSpeedY;
+        sX = sX + secondsElapsed * sSpeedX;
+        sY = sY + secondsElapsed * sSpeedY;
     }
 
+    // Collision detection functions between sprites
+    public boolean topHit(Sprite s)   { return isMovingUp() && topOverlaps(s) && widthOverlap(s); }
+    public boolean bottomHit(Sprite s){ return isMovingDown() && bottomOverlaps(s) && widthOverlap(s); }
+    public boolean leftHit(Sprite s)  { return isMovingLeft() && leftOverlaps(s) && heightOverlap(s); }
+    public boolean rightHit(Sprite s) { return isMovingRight() && rightOverlaps(s) && heightOverlap(s); }
+    public boolean hit(Sprite s)      { return topHit(s) || bottomHit(s) || leftHit(s) || rightHit(s); }
 
+    public boolean reboundOff(Sprite s) {
+
+        boolean moved = false;
+
+        // If the ball hits the sides of other objects, then it moves along the X axis
+        // If ball hits top or bottom of other objects, then it moves along the Y axis
+        // If it hits a corner, it can move along both axis (Most common occurence)
+
+        // Check the amount of horizontal and vertical overlap
+        // and bounce the direction with the smallest overlap
+        // or if the overlaps are the same, bounce both
+
+        // horizontal overlap is from left or right overlap
+        // we want to find the smallest overlap, so use Float.MAX_VALUE as the "no overlap" value
+        float horizontalOverlap =
+                leftHit(s)? leftOverlap(s):
+                        rightHit(s)? rightOverlap(s):
+                                Float.MAX_VALUE;
+
+        // vertical overlap is from top or bottom overlap
+        float verticalOverlap =
+                topHit(s)? topOverlap(s) :
+                        bottomHit(s)? bottomOverlap(s) :
+                                Float.MAX_VALUE;
+
+        // if horizontal overlap is smaller,
+        // it was a horizontal hit with a pre-existing vertical overlap,
+        // so bounce horizontally
+        if ( horizontalOverlap < verticalOverlap ) {
+            // change speed to negative value of itself. E.g. xSpeed = -50 -> moveX() -> xSpeed = 50
+            moveX();
+            moved = true;
+        }
+        // if vertical overlap is smaller,
+        // it was a vertical hit with a pre-existing horizontal overlap,
+        // so bounce vertically
+        if ( verticalOverlap < horizontalOverlap ) {
+            moveY();
+            moved = true;
+        }
+        // both are the same, so if they are valid,
+        // it was a corner hit, so bounce both ways
+        else if ( horizontalOverlap != Float.MAX_VALUE ) {
+            moveX();
+            moveY();
+            moved = true;
+        }
+        return moved;
+    }
 }
