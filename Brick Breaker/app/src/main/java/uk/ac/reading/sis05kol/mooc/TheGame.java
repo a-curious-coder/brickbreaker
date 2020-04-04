@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 
+import java.util.Random;
+
 
 public class TheGame extends GameThread{
 
@@ -19,6 +21,7 @@ public class TheGame extends GameThread{
     private Paddle mPaddle;
     private Paddle mPaddleGlow;
     // Arrays of Bricks
+    private Brick[] lifeBrick;
     private Brick[] mBricks;
     private Brick[] mActiveBricks;
 
@@ -51,14 +54,30 @@ public class TheGame extends GameThread{
         // Idea is to create a row of bricks - Unknown screen size.
         // Set up a number of bricks and decide how many of them to use in setupBeginning()
 
-        int numberOfBricks = 48;
+        int nBasicBricks = 48;
+        int nLifeBricks;
+        int nPowerUpBricks;
+        // Basic brick  -   Updates score by 1 as do most other bricks.
         Bitmap brickImage = BitmapFactory.decodeResource(
                 gameView.getContext().getResources(),
                     R.drawable.pink_block);
+        // Life Brick   -   Gives additional lives to player
+        Bitmap lifeBrickImage = BitmapFactory.decodeResource(
+                gameView.getContext().getResources(),
+                R.drawable.yellow_block);
+        // Power Brick  -   Awards player 10 points
+        Bitmap powerBrickImage = BitmapFactory.decodeResource(
+                gameView.getContext().getResources(),
+                R.drawable.power_block);
 
-        mBricks = new Brick[numberOfBricks];
+        mBricks = new Brick[nBasicBricks];
+        Random rnd = new Random();
+        int rndLifeBrick = rnd.nextInt(nBasicBricks);
         for (int i = 0; i < mBricks.length; ++i)
-            mBricks[i] = new Brick(brickImage);
+            if  (i == rndLifeBrick)
+                mBricks[i] = new Brick(brickImage, BrickType.LIFE);
+            else
+                mBricks[i] = new Brick(brickImage, BrickType.BASIC);
 
 
         //Prepare the image of the SmileyBall so we can draw it on the screen (using a canvas)
@@ -239,8 +258,10 @@ public class TheGame extends GameThread{
 
         if  (mActiveBricks != null) {
             for (int i = 0; i < mActiveBricks.length; i++)  {
-                if  (mActiveBricks[i] != null && mBall.isOverlapping( mActiveBricks[i] ))    {
+
+                if  (mActiveBricks[i] != null && mBall.isOverlapping( mActiveBricks[i]) )    {
                     mBall.reboundOff( mActiveBricks[i] );
+                    if()
                     // When brick is hit, the brick disappears from array holding that brick.
                     mActiveBricks[i] = null;
 
@@ -310,7 +331,9 @@ public class TheGame extends GameThread{
 
     }
 
+    private void LevelOne(int numberOfBricks)   {
 
+    }
 
 }
 

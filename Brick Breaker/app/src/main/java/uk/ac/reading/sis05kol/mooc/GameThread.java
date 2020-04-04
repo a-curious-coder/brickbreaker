@@ -19,6 +19,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public abstract class GameThread extends Thread	{
+
+	private static final int MAX_FPS = 60;
+	private double averageFPS;
+
 	//Different mMode states
 	public static final int STATE_LOSE = 1;
 	public static final int STATE_PAUSE = 2;
@@ -115,22 +119,52 @@ public abstract class GameThread extends Thread	{
 	@Override
 	public void run() {
 		Canvas canvasRun;
+		long startTime;
+		long timeMillis = 1000 / MAX_FPS;
+		long waitTime;
+		int frameCount = 0;
+		long totalTime = 0;
+		long targetTime = 1000 / MAX_FPS;
+
+
 		while (mRun) {
 			canvasRun = null;
+			startTime = System.nanoTime();
+
 			try {
 				canvasRun = mSurfaceHolder.lockCanvas(null);
 				synchronized (monitor) {
 					if (mMode == STATE_RUNNING) {
-						updatePhysics();
+						this.updatePhysics();
 					}
 					doDraw(canvasRun);
 				}
-			} 
-			finally {
-				if (canvasRun != null) {
-					if(mSurfaceHolder != null)
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				if (canvasRun != null && mSurfaceHolder != null) {
+					try {
 						mSurfaceHolder.unlockCanvasAndPost(canvasRun);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
+			}
+			timeMillis = System.nanoTime() - startTime/1000000;
+			waitTime = targetTime - timeMillis;
+			// This try catch is where we're capping framerate
+			try	{
+				if	(waitTime > 0)	{
+					this.sleep(waitTime);
+				}
+			} catch	(Exception e)	{e.printStackTrace();}
+
+			totalTime += System.nanoTime() - startTime;
+			frameCount++;
+			if (frameCount == MAX_FPS)	{
+				averageFPS = 1000/((totalTime/frameCount)/1000000);
+				frameCount = 0;
+				totalTime = 0;
 			}
 		}
 	}
