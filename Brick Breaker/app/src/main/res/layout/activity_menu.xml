@@ -8,34 +8,18 @@
     android:gravity="center"
     android:background="@drawable/gradient_list">
 
-    <TextView
+    <ImageView
         android:id="@+id/menuTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/kush"
-        android:text="@string/menu_title"
-        android:textSize="40sp" />
+        android:src="@drawable/game_title"
+        />
 
     <TableLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp">
+        android:layout_marginTop="20dp">
 
-        <TableRow
-            android:gravity="center_vertical">
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/yellow_ball"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/kush"
-                android:text="30 points"
-                android:textSize="18sp"
-                android:paddingLeft="10dp"/>
-        </TableRow>
     </TableLayout>
 
     <TableLayout
@@ -43,35 +27,73 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp">
 
+        <!--Power brick -->
         <TableRow
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:layout_marginBottom="10dp">
             <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ball"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/power_brick"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/kush"
-                android:text="10 points"
+                android:text="\t10 points"
                 android:textSize="18sp"
                 android:paddingLeft="10dp"/>
         </TableRow>
+
+        <!--Normal/Basic brick -->
+        <TableRow
+            android:gravity="center_vertical"
+            android:layout_marginBottom="10dp">
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/basic_brick"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/kush"
+                android:text="\t5 Points"
+                android:textSize="18sp"
+                android:paddingLeft="10dp"/>
+        </TableRow>
+
+        <!--Life brick -->
+        <TableRow
+            android:gravity="center_vertical">
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/life_brick"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/kush"
+                android:textSize="18sp"
+                android:paddingLeft="10dp"
+                android:text="\t1 Life"/>
+        </TableRow>
     </TableLayout>
 
-    <Button
+
+
+    <ImageView
         android:id="@+id/startGame"
-        android:layout_height="60dp"
-        android:layout_width="200dp"
-        android:layout_marginTop="60dp"
-        android:fontFamily="@font/kush"
-        android:text="Start"
-        android:textColor="#FFFFFF"
-        android:textSize="30sp"
+        android:src="@drawable/rectangle_play_button"
+        android:layout_height="100dp"
+        android:layout_width="100dp"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="50dp"
         android:onClick="mainMenu"
-        android:background="@drawable/buttonshape"
         />
+
+
 
 
 </LinearLayout>

@@ -363,7 +363,7 @@ public abstract class GameThread extends Thread	{
 			Message msg = mHandler.obtainMessage();
 			Bundle b = new Bundle();
 			b.putBoolean("score", true);
-			b.putString("text", getScoreString().toString());
+			b.putString("text", "Score: " + getScoreString().toString());
 			msg.setData(b);
 			mHandler.sendMessage(msg);
 		}

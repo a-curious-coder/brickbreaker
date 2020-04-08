@@ -37,6 +37,7 @@ public class Sprite {
 
     }
 
+
     public float getX()     { return this.sX; }
     public float getY()     { return this.sY; }
     public float getWidth() { return this.sWidth; }

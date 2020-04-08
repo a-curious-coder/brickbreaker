@@ -4,7 +4,7 @@ package uk.ac.reading.sis05kol.mooc;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-
+import java.util.ArrayList;
 import java.util.Random;
 
 
@@ -21,17 +21,27 @@ public class TheGame extends GameThread{
     private Paddle mPaddle;
     private Paddle mPaddleGlow;
     // Arrays of Bricks
-    private Brick[] lifeBrick;
     private Brick[] mBricks;
     private Brick[] mActiveBricks;
+    // Number of levels in the game
+    private int levels = 5;
+
+    // To hold my levels
+    ArrayList<Integer>[] mLevels = new ArrayList[levels];
 
     private float x;
 
-    //This is run before anything else, so we can prepare things here
+    //  This is run before anything else, so we can prepare things here
     public TheGame(GameView gameView) {
 
-        //House keeping
+        //  House keeping
         super(gameView);
+
+        //  Initialises levels
+        for (int i = 0; i < levels; i++) {
+            mLevels[i] = new ArrayList<Integer>();
+        }
+
 
         //Prepare the image so we can draw it on the screen (using a canvas)
         mBall = new Ball (BitmapFactory.decodeResource
@@ -54,30 +64,19 @@ public class TheGame extends GameThread{
         // Idea is to create a row of bricks - Unknown screen size.
         // Set up a number of bricks and decide how many of them to use in setupBeginning()
 
-        int nBasicBricks = 48;
-        int nLifeBricks;
-        int nPowerUpBricks;
         // Basic brick  -   Updates score by 1 as do most other bricks.
-        Bitmap brickImage = BitmapFactory.decodeResource(
-                gameView.getContext().getResources(),
-                    R.drawable.pink_block);
+        Bitmap basicBrick = brickImage(gameView, Brick.BrickType.BASIC);
         // Life Brick   -   Gives additional lives to player
-        Bitmap lifeBrickImage = BitmapFactory.decodeResource(
-                gameView.getContext().getResources(),
-                R.drawable.yellow_block);
+        Bitmap lifeBrick = brickImage(gameView, Brick.BrickType.LIFE);
         // Power Brick  -   Awards player 10 points
-        Bitmap powerBrickImage = BitmapFactory.decodeResource(
-                gameView.getContext().getResources(),
-                R.drawable.power_block);
+        Bitmap powerBrick = brickImage(gameView, Brick.BrickType.POWERPOINTS);
 
-        mBricks = new Brick[nBasicBricks];
-        Random rnd = new Random();
-        int rndLifeBrick = rnd.nextInt(nBasicBricks);
-        for (int i = 0; i < mBricks.length; ++i)
-            if  (i == rndLifeBrick)
-                mBricks[i] = new Brick(brickImage, BrickType.LIFE);
-            else
-                mBricks[i] = new Brick(brickImage, BrickType.BASIC);
+        // Add quantities of each brick type to level 1
+        this.mLevels[0].add(5);     // 5 Basic bricks
+        this.mLevels[0].add(2);     // 2 power bricks
+        this.mLevels[0].add(1);     // 1 life brick
+
+        Level level1 = new Level(1, basicBrick, lifeBrick, powerBrick);
 
 
         //Prepare the image of the SmileyBall so we can draw it on the screen (using a canvas)
@@ -95,62 +94,15 @@ public class TheGame extends GameThread{
     @Override
     public void setupBeginning() {
 
-        // Ball positioned in middle of screen, speed dictates the ball moves straight down toward paddle.
-        mBall.setPosition(mCanvasWidth / 2, mCanvasHeight / 2);
-        mBall.setSpeed(mCanvasWidth / 20, mCanvasHeight / 3);
-        mBallGlow.setPosition(mBall.getX(), mBall.getY());
-        mBallGlow.setSpeed(mBall.getSpeedX(), mBall.getSpeedY());
-
-        // Paddle at the bottom of the screen in the middle
-        mPaddle.setPosition(mCanvasWidth / 2, mCanvasHeight - ( mPaddle.getHeight() + mPaddleGlow.getHeight()) / 2);
-        mPaddleGlow.setPosition(mPaddle.getX(), mPaddle.getY());
-        mPaddle.setSpeed(0, 0); // Set to 0, 0 just in case it's a new game
-        mPaddleGlow.setSpeed(mPaddle.getSpeedX(), mPaddle.getSpeedY());
-
-        // If there are bricks and the first brick element is not null then
-        if ( mBricks != null && mBricks[0] != null) {
-
-            // Space between bricks
-            int gapBetweenBricks = 15;
-            float brickWidth = mBricks[0].getWidth() + gapBetweenBricks;
-            // we want to use enough bricks to fill a row
-            int bricksPerRow = (int) (mCanvasWidth / brickWidth);
-
-            // but we can only use up to the number of bricks that we already have available
-            if (bricksPerRow > mBricks.length) {
-                bricksPerRow = mBricks.length;
-            }
-
-            // initialise the array to hold the bricks we want to use
-            mActiveBricks = new Brick[mBricks.length];
-
-            // set up position of first brick
-            float margin = mCanvasWidth - (brickWidth * bricksPerRow);
-            float nextBrickX = (margin / 2 + brickWidth / 2);
-            float nextBrickY = mCanvasHeight / 3;
-
-            // reference the required number of available bricks in the active brick array
-            // Set bricks positions
-            for (int i = 0; i < mActiveBricks.length; ++i) {
-                mActiveBricks[i] = mBricks[i];
-
-                // If x coordinate of the next brick is over the value of mCanvasWidth then
-                // move to a new row above current row
-                if (nextBrickX > mCanvasWidth) {
-                    nextBrickY += -(mBricks[i].getHeight() + gapBetweenBricks);
-                    nextBrickX = margin / 2 + brickWidth / 2;
-                }
-
-                mActiveBricks[i].setPosition(nextBrickX, nextBrickY);
-                nextBrickX += brickWidth;
-            }
-        }
+        setupBall();    // Ball positioned in middle of screen, speed dictates the ball moves straight down toward paddle.
+        setupPaddle();  // Paddle at the bottom of the screen in the middle
+        organiseBricks();   // If there are bricks and the first brick element is not null then
     }
 
     @Override
     protected void doDraw(Canvas canvas) {
         //If there isn't a canvas to do nothing
-        //It is ok not understanding what is happening herep
+        //It is ok not understanding what is happening here
         if(canvas == null) return;
 
         //House keeping
@@ -214,7 +166,7 @@ public class TheGame extends GameThread{
 
     }
 
-    private void moveOffSides(Sprite s, float secondsElapsed)    {
+    private void moveSprite(Sprite s, float secondsElapsed)    {
 
         // Moves the ball during the game runtime
         s.move(secondsElapsed);
@@ -232,77 +184,37 @@ public class TheGame extends GameThread{
             s.moveX();
         }
 
-
-
     }
 
     //This is run just before the game "scenario" is printed on the screen
     @Override
     protected void updateGame(float secondsElapsed) {
-        if  (mBallGlow.getX() != mBall.getX() || mBallGlow.getY() != mBall.getY())  {
+        if (mBallGlow.getX() != mBall.getX() || mBallGlow.getY() != mBall.getY()) {
             mBallGlow.setSpeed(mBall.getSpeedX(), mBall.getSpeedY());
             mBallGlow.setPosition(mBall.getX(), mBall.getY());
         }
-
         mBallGlow.move(secondsElapsed);
 
-        if  (mBall.isMovingDown() && mBall.isOverlapping(mPaddle))    {
-            // Bounce the ball off of the paddle, not the paddle from the ball.
-            mBall.reboundOff(mPaddle);
-        }
 
-        if (mBall.reboundOff(mSmileyBall) && mSmileyBall.reboundOff(mBall)) {
-            updateScore(1);
-        }
+        checkBallCollisions();
+        checkBrickCollisions();
 
-
-        if  (mActiveBricks != null) {
-            for (int i = 0; i < mActiveBricks.length; i++)  {
-
-                if  (mActiveBricks[i] != null && mBall.isOverlapping( mActiveBricks[i]) )    {
-                    mBall.reboundOff( mActiveBricks[i] );
-                    if()
-                    // When brick is hit, the brick disappears from array holding that brick.
-                    mActiveBricks[i] = null;
-
-                    // Adds to score if brick is hit.
-                    updateScore(1);
-                }
-            }
-
-            // check if there are remaining bricks.
-            boolean remainingBricks = false;
-            for (int i = 0; i < mActiveBricks.length; i++)  {
-                if  (mActiveBricks[i] != null)  {
-                    remainingBricks = true;
-                }
-            }
-
-            // if all bricks are gone from mActiveBricks, repopulate the array.
-            if  (!remainingBricks)  {
-                for (int i = 0; i < mActiveBricks.length; i++)  {
-                    mActiveBricks[i] = mBricks[i];
-                }
-            }
-        }
-
-        // Keeps ball moving during runtime - deals with sides of screen
-        moveOffSides(mBall, secondsElapsed);
+        // Keeps ball moving during runtime and deals with ball hitting any side of screen
+        moveSprite(mBall, secondsElapsed);
 
         // Move paddle toward touch on screen over period of time
         mPaddle.move(secondsElapsed);
         mPaddleGlow.move(secondsElapsed);
 
-        if  (mPaddle.isPaddleAtDestination(mPaddle.getX(), x))    {
+        if (mPaddle.isPaddleAtDestination(mPaddle.getX(), x)) {
             mPaddle.stopPaddle(mPaddle.getX());
             mPaddleGlow.stopPaddle(mPaddle.getX());
         }
 
-        if  ( mPaddle.isMovingLeft() && mPaddle.getX() <= 0)    {
+        if (mPaddle.isMovingLeft() && mPaddle.getX() <= 0) {
             mPaddle.stopAt(0);
             mPaddleGlow.stopAt(mPaddle.getX());
-        }
-        else if (mPaddle.isMovingRight() && mPaddle.getX() >= mCanvasWidth)  {
+        } else if (mPaddle.isMovingRight() && mPaddle.getX() >= mCanvasWidth) {
             mPaddle.stopAt(mCanvasWidth);
             mPaddleGlow.stopAt(mPaddle.getX());
         }
@@ -331,8 +243,187 @@ public class TheGame extends GameThread{
 
     }
 
-    private void LevelOne(int numberOfBricks)   {
+    /**
+     * Positions each brick in certain x and y coordinate.
+     */
+    private void organiseBricks() {
+        if ( mBricks != null && mBricks[0] != null) {
 
+            // Space between bricks
+            int gapBetweenBricks = 15;
+            float brickWidth = mBricks[0].getWidth() + gapBetweenBricks;
+            // we want to use enough bricks to fill a row
+            int bricksPerRow = (int) (mCanvasWidth / brickWidth);
+
+            // but we can only use up to the number of bricks that we already have available
+            if (bricksPerRow > mBricks.length) {
+                bricksPerRow = mBricks.length;
+            }
+
+            // initialise the array to hold the bricks we want to use
+            mActiveBricks = new Brick[mBricks.length];
+
+            // set up position of first brick
+            float margin = mCanvasWidth - (brickWidth * bricksPerRow);
+            float nextBrickX = (margin / 2 + brickWidth / 2);
+            float nextBrickY = mCanvasHeight / 3;
+
+            // reference the required number of available bricks in the active brick array
+            // Set bricks positions
+            for (int i = 0; i < mActiveBricks.length; ++i) {
+                mActiveBricks[i] = mBricks[i];
+
+                // If x coordinate of the next brick is over the value of mCanvasWidth then
+                // move to a new row above current row
+                if (nextBrickX > mCanvasWidth) {
+                    nextBrickY += -(mBricks[i].getHeight() + gapBetweenBricks);
+                    nextBrickX = margin / 2 + brickWidth / 2;
+                }
+
+                // Uses new x and y coords as new brick position. Rinse n repeat.
+                mActiveBricks[i].setPosition(nextBrickX, nextBrickY);
+                nextBrickX += brickWidth;
+            }
+        }
+    }
+
+    /**
+     * set the position and initial speed of the ball at start of new game/level
+     */
+    private void setupBall()    {
+        // Set ball to middle of the canvas/screen.
+        mBall.setPosition(mCanvasWidth / 2, mCanvasHeight / 2);
+        // Ball move down at an angle to randomise movement and collisions.
+        mBall.setSpeed(mCanvasWidth / 20, mCanvasHeight / 3);
+        // mBallGlow is a semantic feature, a glow
+        mBallGlow.setPosition(mBall.getX(), mBall.getY());
+        mBallGlow.setSpeed(mBall.getSpeedX(), mBall.getSpeedY());
+    }
+
+    /**
+     * set initial position and speed of paddle at start of new game/level
+     */
+    private void setupPaddle()   {
+
+        // X: middle of X axis      Y: Full paddle just above the CanvasHeight limit.
+        mPaddle.setPosition(mCanvasWidth / 2, mCanvasHeight - ( mPaddle.getHeight() + mPaddleGlow.getHeight()) / 2);
+        // Speed of paddle is 0 when game starts and for newer levels so it doesn't try to react to previous level touches.
+        mPaddle.setSpeed(0, 0);
+        // mPaddle Glow is a semantic feature, it follows the paddle's movements.
+        mPaddleGlow.setPosition(mPaddle.getX(), mPaddle.getY());
+        // mPaddleGlow is a semantic feature, copies the paddles speed.
+        mPaddleGlow.setSpeed(mPaddle.getSpeedX(), mPaddle.getSpeedY());
+    }
+
+    /**
+     *
+     * @param level     Level ArrayList containing number of bricks within each brickType
+     * @param basicBrick Stores image of basicBrick
+     * @param lifeBrick  Stores image of lifeBrick
+     * @param powerBrick Stores image of powerBrick
+     * TODO: Refine this function, make it cleaner, reduce unecessary parameters.
+     */
+    /*private void setBricks (ArrayList<Integer> level, Bitmap basicBrick, Bitmap lifeBrick, Bitmap powerBrick)    {
+
+        Random rnd = new Random();
+
+        // set quantities for each brick type
+        int nBasicBrick = level.get(0); //  (45 basic bricks)
+        int nLifeBrick = level.get(1);  //  (3 power bricks)
+        int nPowerBrick = level.get(2); //  (1 life brick)
+
+        //  Add all bricks together
+        int totalBricks = nBasicBrick + nLifeBrick + nPowerBrick;
+
+        // Set this mBricks variable to the size of totalBricks
+        this.mBricks = new Brick[totalBricks];
+
+        int rndBrick = 0;
+        // Sets all bricks to basic
+        for (int i = 0; i < totalBricks; i++)   {
+            mBricks[i] = new Brick(basicBrick);
+        }
+
+        for (int i = 0; i < nLifeBrick; i++)    {
+            rndBrick = rnd.nextInt(totalBricks);
+            mBricks[rndBrick] = new Brick(powerBrick);
+        }
+
+        for (int i = 0; i < nPowerBrick; i++)   {
+            rndBrick = rnd.nextInt(totalBricks);
+            mBricks[rndBrick] = new Brick(lifeBrick);
+        }
+
+    }*/
+
+    /**
+     * Checks if ball collides with paddle and other objects
+     */
+    private void checkBallCollisions()  {
+        if (mBall.isMovingDown() && mBall.isOverlapping(mPaddle)) {
+            // Bounce the ball off of the paddle, not the paddle from the ball.
+            mBall.reboundOff(mPaddle);
+            mBallGlow.setSpeed(mBall.getSpeedX(), mBall.getSpeedY());
+        }
+
+        if (mBall.reboundOff(mSmileyBall) && mSmileyBall.reboundOff(mBall)) {
+            updateScore(1);
+        }
+    }
+
+    /**
+     * Check if bricks are active or not
+     * Takes action if a brick is not active.
+     */
+    private void checkBrickCollisions()  {
+        if (mActiveBricks != null) {
+            for (int i = 0; i < mActiveBricks.length; i++) {
+
+                if (mActiveBricks[i] != null && mBall.isOverlapping(mActiveBricks[i])) {
+                    mBall.reboundOff(mActiveBricks[i]);
+                    mBallGlow.setSpeed(mBall.getSpeedX(), mBall.getSpeedY());
+                    // When brick is hit, the brick disappears from array holding that brick.
+                    mActiveBricks[i] = null;
+                    // Adds to score if brick is hit.
+                    updateScore(1);
+                }
+            }
+
+            // check if there are remaining bricks.
+            boolean remainingBricks = false;
+            for (int i = 0; i < mActiveBricks.length; i++) {
+                if (mActiveBricks[i] != null) {
+                    remainingBricks = true;
+                }
+            }
+
+            // if all bricks are gone from mActiveBricks Array...
+            // TODO: Game state to win, change level, repopulate array.
+            if (!remainingBricks) {
+                for (int i = 0; i < mActiveBricks.length; i++) {
+                    mActiveBricks[i] = mBricks[i];
+                }
+            }
+        }
+    }
+    /**
+     * Used to determine which bitmap image is used for which brickType.
+     * @param gameView  used to set image
+     * @param brickType which brick type we want an image for
+     * @return  image that corresponds to the imported brickType
+     */
+    private Bitmap brickImage(GameView gameView, Brick.BrickType brickType)    {
+
+        //  Default image is a basic brick
+        Bitmap image = BitmapFactory.decodeResource(gameView.getContext().getResources(), R.drawable.basic_brick);
+
+        if  (brickType == Brick.BrickType.LIFE)
+            image = BitmapFactory.decodeResource(gameView.getContext().getResources(), R.drawable.life_brick);
+
+        if  (brickType == Brick.BrickType.POWERPOINTS)
+            image = BitmapFactory.decodeResource(gameView.getContext().getResources(), R.drawable.power_brick);
+
+        return image;
     }
 
 }
