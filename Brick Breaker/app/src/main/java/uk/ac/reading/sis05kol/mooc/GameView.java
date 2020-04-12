@@ -25,6 +25,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 	//Pointers to the views
 	private TextView mScoreView;
 	private TextView mStatusView;
+	private TextView mScore;
+	private TextView mHighScore;
+
 
     Sensor accelerometer;
     Sensor magnetometer;
@@ -117,6 +120,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 	public void setScoreView(TextView mScoreView) {
 		this.mScoreView = mScoreView;
 	}
+
+	public TextView getScore()	{ return mScore; }
+
+	public void setScore(TextView mScore)	{this.mScore = mScore}
+
+	public TextView getHighScore()	{ return mHighScore; }
+
+	public void setHighScore(TextView mScore)	{this.mHighScore = mHighScore}
 	
 
 	public Handler getmHandler() {

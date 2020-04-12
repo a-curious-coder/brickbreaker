@@ -1,9 +1,12 @@
 package uk.ac.reading.sis05kol.mooc;
 
 //Other parts of the android libraries that we use
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.view.View;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -23,25 +26,22 @@ public class TheGame extends GameThread{
     // Arrays of Bricks
     private Brick[] mBricks;
     private Brick[] mActiveBricks;
-    // Number of levels in the game
-    private int levels = 5;
+    private Bitmap basicBrick, powerBrick, lifeBrick;
 
-    // To hold my levels
-    ArrayList<Integer>[] mLevels = new ArrayList[levels];
+    // Initial starting level
+    private int nLevel = 1;
+    // Lives player has in the game.
+    private int lives = 3;
 
     private float x;
+    // A factor that determines where the ball will deflect to when hitting the paddle.
+    private float friction = (float)0.6;
 
     //  This is run before anything else, so we can prepare things here
     public TheGame(GameView gameView) {
 
         //  House keeping
         super(gameView);
-
-        //  Initialises levels
-        for (int i = 0; i < levels; i++) {
-            mLevels[i] = new ArrayList<Integer>();
-        }
-
 
         //Prepare the image so we can draw it on the screen (using a canvas)
         mBall = new Ball (BitmapFactory.decodeResource
@@ -55,28 +55,27 @@ public class TheGame extends GameThread{
         //Prepare the image of the paddle so we can draw it on the screen (using a canvas)
         mPaddle = new Paddle (BitmapFactory.decodeResource
                 (gameView.getContext().getResources(),
-                        R.drawable.platform));
+                        R.drawable.paddle));
 
         mPaddleGlow = new  Paddle (BitmapFactory.decodeResource
                 (gameView.getContext().getResources(),
-                        R.drawable.platform_glow));
+                        R.drawable.paddle_glow));
 
         // Idea is to create a row of bricks - Unknown screen size.
         // Set up a number of bricks and decide how many of them to use in setupBeginning()
 
         // Basic brick  -   Updates score by 1 as do most other bricks.
         Bitmap basicBrick = brickImage(gameView, Brick.BrickType.BASIC);
-        // Life Brick   -   Gives additional lives to player
-        Bitmap lifeBrick = brickImage(gameView, Brick.BrickType.LIFE);
+            this.basicBrick = basicBrick;
         // Power Brick  -   Awards player 10 points
         Bitmap powerBrick = brickImage(gameView, Brick.BrickType.POWERPOINTS);
+            this.powerBrick = powerBrick;
+        // Life Brick   -   Gives additional lives to player
+        Bitmap lifeBrick = brickImage(gameView, Brick.BrickType.LIFE);
+            this.lifeBrick = lifeBrick;
 
-        // Add quantities of each brick type to level 1
-        this.mLevels[0].add(5);     // 5 Basic bricks
-        this.mLevels[0].add(2);     // 2 power bricks
-        this.mLevels[0].add(1);     // 1 life brick
-
-        Level level1 = new Level(1, basicBrick, lifeBrick, powerBrick);
+        setLevel(nLevel);
+        updateLevel(nLevel);
 
 
         //Prepare the image of the SmileyBall so we can draw it on the screen (using a canvas)
@@ -177,7 +176,14 @@ public class TheGame extends GameThread{
         } else if (s.isMovingDown() && s.getBottom() >= mCanvasHeight) {
             // You lose the game if the ball hits the bottom
             setupBeginning();
-            setState(STATE_LOSE);
+            this.lives--;
+
+            if(this.lives == 0) {
+                this.nLevel = 1;
+                setState(STATE_LOSE);
+            }
+            else if(this.lives != 0)
+                setState(STATE_LIFE_LOST);
         }
         // ball moves to left/right side depending which side of screen it hits. E.g. hits right side, move left.
         if ((s.isMovingLeft() && s.getLeft() <= 0) || (s.isMovingRight() && s.getRight() >= mCanvasWidth))  {
@@ -294,7 +300,7 @@ public class TheGame extends GameThread{
         // Set ball to middle of the canvas/screen.
         mBall.setPosition(mCanvasWidth / 2, mCanvasHeight / 2);
         // Ball move down at an angle to randomise movement and collisions.
-        mBall.setSpeed(mCanvasWidth / 20, mCanvasHeight / 3);
+        mBall.setSpeed(0, mCanvasHeight/3);
         // mBallGlow is a semantic feature, a glow
         mBallGlow.setPosition(mBall.getX(), mBall.getY());
         mBallGlow.setSpeed(mBall.getSpeedX(), mBall.getSpeedY());
@@ -315,46 +321,6 @@ public class TheGame extends GameThread{
         mPaddleGlow.setSpeed(mPaddle.getSpeedX(), mPaddle.getSpeedY());
     }
 
-    /**
-     *
-     * @param level     Level ArrayList containing number of bricks within each brickType
-     * @param basicBrick Stores image of basicBrick
-     * @param lifeBrick  Stores image of lifeBrick
-     * @param powerBrick Stores image of powerBrick
-     * TODO: Refine this function, make it cleaner, reduce unecessary parameters.
-     */
-    /*private void setBricks (ArrayList<Integer> level, Bitmap basicBrick, Bitmap lifeBrick, Bitmap powerBrick)    {
-
-        Random rnd = new Random();
-
-        // set quantities for each brick type
-        int nBasicBrick = level.get(0); //  (45 basic bricks)
-        int nLifeBrick = level.get(1);  //  (3 power bricks)
-        int nPowerBrick = level.get(2); //  (1 life brick)
-
-        //  Add all bricks together
-        int totalBricks = nBasicBrick + nLifeBrick + nPowerBrick;
-
-        // Set this mBricks variable to the size of totalBricks
-        this.mBricks = new Brick[totalBricks];
-
-        int rndBrick = 0;
-        // Sets all bricks to basic
-        for (int i = 0; i < totalBricks; i++)   {
-            mBricks[i] = new Brick(basicBrick);
-        }
-
-        for (int i = 0; i < nLifeBrick; i++)    {
-            rndBrick = rnd.nextInt(totalBricks);
-            mBricks[rndBrick] = new Brick(powerBrick);
-        }
-
-        for (int i = 0; i < nPowerBrick; i++)   {
-            rndBrick = rnd.nextInt(totalBricks);
-            mBricks[rndBrick] = new Brick(lifeBrick);
-        }
-
-    }*/
 
     /**
      * Checks if ball collides with paddle and other objects
@@ -362,7 +328,11 @@ public class TheGame extends GameThread{
     private void checkBallCollisions()  {
         if (mBall.isMovingDown() && mBall.isOverlapping(mPaddle)) {
             // Bounce the ball off of the paddle, not the paddle from the ball.
-            mBall.reboundOff(mPaddle);
+            //mBall.reboundOff(mPaddle);
+            System.out.println("mBall.getSpeedX(): " + mBall.getSpeedX());
+            System.out.println("BEFORE: setSpeed\t x:" + mBall.getSpeedX() + "\ty:" + -mBall.getSpeedY());
+            mBall.setSpeed(mBall.getSpeedX() + mPaddle.getSpeedX() * friction, -mBall.getSpeedY());
+            System.out.println("AFTER: setSpeed\t x:" + mBall.getSpeedX() + "\ty:" + -mBall.getSpeedY());
             mBallGlow.setSpeed(mBall.getSpeedX(), mBall.getSpeedY());
         }
 
@@ -376,16 +346,24 @@ public class TheGame extends GameThread{
      * Takes action if a brick is not active.
      */
     private void checkBrickCollisions()  {
+        // This is here as a parameter to ensure that the rebound function is called
+        // only once even when the ball collides with two bricks.
+        int j = 0;
+        // if the array of bricks isn't equal to nothing then
         if (mActiveBricks != null) {
+            // For every brick in the mActiveBricks array
             for (int i = 0; i < mActiveBricks.length; i++) {
-
+                // if mActiveBrick 'i' is not equal to nothing AND the ball is overlapping this brick then
                 if (mActiveBricks[i] != null && mBall.isOverlapping(mActiveBricks[i])) {
-                    mBall.reboundOff(mActiveBricks[i]);
-                    mBallGlow.setSpeed(mBall.getSpeedX(), mBall.getSpeedY());
+                    // Rebound the ball off of the bricks
+                    if (j == 0)
+                        mBall.reboundOff(mActiveBricks[i]);
+                        j++;
                     // When brick is hit, the brick disappears from array holding that brick.
                     mActiveBricks[i] = null;
                     // Adds to score if brick is hit.
                     updateScore(1);
+                    // Breaks out loop when a brick is hit. Avoids problems if more than one is hit.
                 }
             }
 
@@ -400,12 +378,14 @@ public class TheGame extends GameThread{
             // if all bricks are gone from mActiveBricks Array...
             // TODO: Game state to win, change level, repopulate array.
             if (!remainingBricks) {
-                for (int i = 0; i < mActiveBricks.length; i++) {
-                    mActiveBricks[i] = mBricks[i];
-                }
+                this.nLevel++;
+                setState(STATE_NEXT_LEVEL);
+                setLevel(nLevel);
+                setupBeginning();
             }
         }
     }
+
     /**
      * Used to determine which bitmap image is used for which brickType.
      * @param gameView  used to set image
@@ -426,6 +406,44 @@ public class TheGame extends GameThread{
         return image;
     }
 
+    public void setLevel (int nLevel)  {
+        Level level = new Level();
+
+        switch(nLevel)
+        {
+            case 1:
+                this.mBricks = level.Level(1, basicBrick, powerBrick, lifeBrick);
+                break;
+            case 2:
+                this.mBricks = level.Level(2, basicBrick, powerBrick, lifeBrick);
+                break;
+            case 3:
+                this.mBricks = level.Level(3, basicBrick, powerBrick, lifeBrick);
+                break;
+            case 4:
+                this.mBricks = level.Level(4, basicBrick, powerBrick, lifeBrick);
+                break;
+            case 5:
+                this.mBricks = level.Level(5, basicBrick, powerBrick, lifeBrick);
+                break;
+        }
+
+    }
+    protected void winGame()    {
+        setState(STATE_WIN);
+    }
+
+    protected void loseGame()    {
+        setState(STATE_LOSE);
+    }
+
+    public void pauseGame()  {
+        setState(STATE_PAUSE);
+    }
+
+    public void pauseTheGame(View view) {
+
+    }
 }
 
 // This file is part of the course "Begin Programming: Build your first mobile game" from futurelearn.com

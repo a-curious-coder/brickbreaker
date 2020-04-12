@@ -28,7 +28,7 @@ This is my attempt at creating a brick breaker type game using Java in Android S
 Game has levels
 
 - [ ] Works
-- [ ] Attempted
+- [x] Attempted
 
 Use of standardised data structures (e.g. Lists, Vectors, Collection, Date)
 

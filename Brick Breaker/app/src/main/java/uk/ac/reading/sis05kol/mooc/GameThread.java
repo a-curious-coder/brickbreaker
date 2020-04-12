@@ -29,6 +29,8 @@ public abstract class GameThread extends Thread	{
 	public static final int STATE_READY = 3;
 	public static final int STATE_RUNNING = 4;
 	public static final int STATE_WIN = 5;
+	public static final int STATE_NEXT_LEVEL = 6;
+	public static final int STATE_LIFE_LOST = 7;
 
 	//Control variable for the mode of the game (e.g. STATE_WIN)
 	protected int mMode = 1;
@@ -62,6 +64,7 @@ public abstract class GameThread extends Thread	{
 	
 	protected long score = 0;
 
+	protected long level = 0;
     //Used for time keeping
 	private long now;
 	private float elapsed;
@@ -214,9 +217,19 @@ public abstract class GameThread extends Thread	{
 			return true;
 		}
 		
-		if(mMode == STATE_PAUSE) {
+		if(mMode == STATE_PAUSE || mMode == STATE_NEXT_LEVEL) {
 			unpause();
 			return true;
+		}
+
+		if(mMode == STATE_LIFE_LOST)	{
+			try {
+				sleep(1000);
+			} catch (InterruptedException ex) {
+				ex.printStackTrace();
+			}
+
+			unpause();
 		}
 		
 		synchronized (monitor) {
@@ -302,6 +315,7 @@ public abstract class GameThread extends Thread	{
 				
 				Resources res = mContext.getResources();
 				CharSequence str = "";
+
 				if (mMode == STATE_READY)
 					str = res.getText(R.string.mode_ready);
 				else 
@@ -311,9 +325,15 @@ public abstract class GameThread extends Thread	{
 						if (mMode == STATE_LOSE)
 							str = res.getText(R.string.mode_lose);
 						else 
-							if (mMode == STATE_WIN) {
+							if (mMode == STATE_WIN)
 								str = res.getText(R.string.mode_win);
-							}
+							else
+								if(mMode == STATE_NEXT_LEVEL)
+									str = res.getText(R.string.mode_next_level);
+								else
+									if(mMode == STATE_LIFE_LOST)	{
+										str = res.getText(R.string.mode_life_lost);
+									}
 
 				if (message != null) {
 					str = message + "\n" + str;
@@ -376,12 +396,36 @@ public abstract class GameThread extends Thread	{
 	public void updateScore(long score) {
 		this.setScore(this.score + score);
 	}
-	
-	
+
 	protected CharSequence getScoreString() {
 		return Long.toString(Math.round(this.score));
 	}
-	
+
+	public void setLevel(int level)	{
+		this.level = level;
+
+		synchronized (monitor) {
+			Message msg = mHandler.obtainMessage();
+			Bundle b = new Bundle();
+			b.putBoolean("score", true);
+			b.putString("text", "Level " + getScoreString().toString());
+			msg.setData(b);
+			mHandler.sendMessage(msg);
+		}
+	}
+
+	public float getLevel() {
+		return level;
+	}
+
+	public void updateLevel(long level) {
+		this.setScore(this.level = level);
+	}
+
+	protected CharSequence getLevelString() {
+		return Long.toString(Math.round(this.level));
+	}
+
 }
 
 // This file is part of the course "Begin Programming: Build your first mobile game" from futurelearn.com

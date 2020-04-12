@@ -44,10 +44,10 @@ public class Sprite {
     public float getHeight(){ return this.sHeight; }
 
     // Frame/proportions of the object. E.g. the left side of object is the x coord minus half of the objects width.
-    public float getLeft()  { return sX-sHalfWidth; }
-    public float getRight() { return sX+sHalfWidth; }
-    public float getTop()   { return sY-sHalfHeight; }
-    public float getBottom(){ return sY+sHalfHeight; }
+    public float getLeft()  { return sX-sHalfWidth; }       // Left side of object
+    public float getRight() { return sX+sHalfWidth; }       // Right side of object
+    public float getTop()   { return sY-sHalfHeight; }      // Top of object
+    public float getBottom(){ return sY+sHalfHeight; }      // Bottom of object
 
     public boolean contains(float x, float y) {
         return getLeft() <= x && x <= getRight() && getTop() <= y && y <= getBottom();
@@ -138,8 +138,8 @@ public class Sprite {
         // If it hits a corner, it can move along both axis (Most common occurence)
 
         // Check the amount of horizontal and vertical overlap
-        // and bounce the direction with the smallest overlap
-        // or if the overlaps are the same, bounce both
+        // and rebound off the object in favour of the direction with the smallest overlap
+        // or if the overlaps are the same, rebound off both coords
 
         // horizontal overlap is from left or right overlap
         // we want to find the smallest overlap, so use Float.MAX_VALUE as the "no overlap" value
@@ -178,4 +178,5 @@ public class Sprite {
         }
         return moved;
     }
+
 }

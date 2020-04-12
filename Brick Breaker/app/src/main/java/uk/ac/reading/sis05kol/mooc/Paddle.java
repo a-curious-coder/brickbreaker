@@ -22,7 +22,6 @@ public class Paddle extends Sprite  {
                 return true;
             }
             return false;
-
     }
 
     public void stopPaddle(float x) {
