@@ -11,9 +11,9 @@
     <!-- TITLE -->
     <ImageView
         android:id="@+id/menuTitle"
-        android:layout_width="390dp"
+        android:layout_width="380dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
+        android:layout_marginTop="50dp"
         android:src="@drawable/game_title1"
         />
 
@@ -22,21 +22,21 @@
     <TableLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="50dp">
 
         <!--Power brick -->
         <TableRow
             android:gravity="center_vertical"
             android:layout_marginBottom="10dp">
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
                 android:src="@drawable/power_brick"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/PLAYSIR"
+                android:fontFamily="@font/playsir"
                 android:text="\t10 points"
                 android:textSize="18sp"
                 android:paddingLeft="10dp"/>
@@ -47,14 +47,14 @@
             android:gravity="center_vertical"
             android:layout_marginBottom="10dp">
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
                 android:src="@drawable/basic_brick"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/PLAYSIR"
+                android:fontFamily="@font/playsir"
                 android:text="\t5 Points"
                 android:textSize="18sp"
                 android:paddingLeft="10dp"/>
@@ -64,29 +64,68 @@
         <TableRow
             android:gravity="center_vertical">
             <ImageView
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
                 android:src="@drawable/life_brick"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/PLAYSIR"
+                android:fontFamily="@font/playsir"
                 android:textSize="18sp"
                 android:paddingLeft="10dp"
                 android:text="\t1 Life"/>
         </TableRow>
+
+        <!-- Enemy -->
+        <TableRow
+            android:gravity="center_vertical">
+            <ImageView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:src="@drawable/enemy"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/playsir"
+                android:textSize="18sp"
+                android:paddingLeft="10dp"
+                android:text="\t-1 Point for\nevery hit"/>
+        </TableRow>
     </TableLayout>
 
 
-
+    <!-- PLAY -->
     <ImageView
         android:id="@+id/startGame"
-        android:src="@drawable/play_button"
+        android:src="@drawable/play_button2"
         android:layout_height="60dp"
-        android:layout_width="180dp"
+        android:layout_width="wrap_content"
         android:layout_centerInParent="true"
         android:layout_marginTop="50dp"
+        android:onClick="mainMenu"
+        />
+
+    <!-- PLAY -->
+    <ImageView
+        android:id="@+id/levelSelection"
+        android:src="@drawable/levels_button"
+        android:layout_height="60dp"
+        android:layout_width="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
+        android:onClick="mainMenu"
+        />
+
+    <!-- PLAY -->
+    <ImageView
+        android:id="@+id/viewLeaderboards"
+        android:src="@drawable/leaderboard_button"
+        android:layout_height="60dp"
+        android:layout_width="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
         android:onClick="mainMenu"
         />
 

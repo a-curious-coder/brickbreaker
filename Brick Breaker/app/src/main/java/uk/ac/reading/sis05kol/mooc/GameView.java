@@ -123,11 +123,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 
 	public TextView getScore()	{ return mScore; }
 
-	public void setScore(TextView mScore)	{this.mScore = mScore}
+	public void setScore(TextView mScore)	{this.mScore = mScore;}
 
 	public TextView getHighScore()	{ return mHighScore; }
 
-	public void setHighScore(TextView mScore)	{this.mHighScore = mHighScore}
+	public void setHighScore(TextView mScore)	{this.mHighScore = mHighScore;}
 	
 
 	public Handler getmHandler() {

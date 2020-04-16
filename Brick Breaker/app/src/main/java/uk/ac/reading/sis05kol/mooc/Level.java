@@ -13,18 +13,19 @@ public class Level  {
     private Bitmap basicBrick, powerBrick, lifeBrick;
     private int nBasic, nPower, nLife;
     private Brick[] mBricks;
+    private ArrayList<Brick> nBricks = new ArrayList<>();
+    private Random rnd = new Random();
 
 
-    Brick[] Level(int level, Bitmap bBrick, Bitmap pBrick, Bitmap lBrick) {
+    ArrayList<Brick> Level(int level, Bitmap bBrick, Bitmap pBrick, Bitmap lBrick) {
         // Giving images to represent bricks.
         this.basicBrick = bBrick;
         this.powerBrick = pBrick;
         this.lifeBrick = lBrick;
 
-
         setupLevel(level);
 
-        return mBricks;
+        return nBricks;
     }
 
     public void setupLevel(int level)    {
@@ -41,11 +42,11 @@ public class Level  {
                 powerBricks = 1;
                 lifeBricks = 0;
                 break;
-
+            // Level 3 is a random level with random numbers of bricks (random numbers of brick-types)
             case 3:
-                basicBricks = 15;
-                powerBricks = 2;
-                lifeBricks = 1;
+                basicBricks = rnd.nextInt(16);
+                powerBricks = rnd.nextInt(3);
+                lifeBricks = rnd.nextInt(3);
                 break;
 
             case 4:
@@ -76,28 +77,31 @@ public class Level  {
      */
     public void setBricks (int nBasicBrick, int nPowerBrick, int nLifeBrick)    {
 
+        int rndBrick = 0;
         Random rnd = new Random();
 
-        //  Add all bricks together
+        //  Add all the level's brick quantities together
         int totalBricks = nBasicBrick + nLifeBrick + nPowerBrick;
 
         // Set this mBricks variable to the size of totalBricks
-        this.mBricks = new Brick[totalBricks];
+        //this.mBricks = new Brick[totalBricks];
 
-        int rndBrick = 0;
-        // Sets all bricks to basic
+        // Set all bricks to basic
         for (int i = 0; i < totalBricks; i++)   {
-            mBricks[i] = new Brick(basicBrick);
+            //mBricks[i] = new Brick(basicBrick);
+            this.nBricks.add(i, new Brick(basicBrick));
         }
 
         for (int i = 0; i < nPowerBrick; i++)   {
             rndBrick = rnd.nextInt(totalBricks);
-            mBricks[rndBrick] = new Brick(powerBrick);
+            //mBricks[rndBrick] = new Brick(powerBrick);
+            this.nBricks.add(rndBrick, new Brick(powerBrick));
         }
 
         for (int i = 0; i < nLifeBrick; i++)    {
             rndBrick = rnd.nextInt(totalBricks);
-            mBricks[rndBrick] = new Brick(lifeBrick);
+            //mBricks[rndBrick] = new Brick(lifeBrick);
+            this.nBricks.add(rndBrick, new Brick(lifeBrick));
         }
 
 

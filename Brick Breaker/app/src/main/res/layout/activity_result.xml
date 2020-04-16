@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:text="150"
         android:textSize="30dp"
-        android:fontFamily="@font/PLAYSIR"
+        android:fontFamily="@font/playsir"
         android:layout_marginTop="75dp"/>
 
     <TextView
@@ -32,13 +32,13 @@
         android:text="High Score: 300"
         android:textSize="16dp"
         android:layout_marginTop="10dp"
-        android:fontFamily="@font/PLAYSIR"/>
+        android:fontFamily="@font/playsir"/>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Try again"
-        android:fontFamily="@font/PLAYSIR"
+        android:fontFamily="@font/playsir"
         android:layout_marginTop="50dp"
         android:textAllCaps="false" />
 

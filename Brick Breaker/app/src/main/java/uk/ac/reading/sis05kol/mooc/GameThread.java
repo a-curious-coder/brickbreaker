@@ -394,7 +394,11 @@ public abstract class GameThread extends Thread	{
 	}
 	
 	public void updateScore(long score) {
-		this.setScore(this.score + score);
+		if	(this.score + score < 0)	{
+			setScore(0);
+		} else {
+			this.setScore(this.score + score);
+		}
 	}
 
 	protected CharSequence getScoreString() {

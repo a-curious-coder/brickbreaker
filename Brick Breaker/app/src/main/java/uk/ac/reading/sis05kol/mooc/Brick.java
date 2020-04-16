@@ -8,7 +8,7 @@ import android.graphics.BitmapFactory;
 public class Brick extends Sprite   {
 
     public enum BrickType   {
-        BASIC, LIFE, POWERUP, POWERPOINTS
+        BASIC, LIFE, POWERPOINT
     }
 
 

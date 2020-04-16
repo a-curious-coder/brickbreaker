@@ -16,7 +16,7 @@ This is my attempt at creating a brick breaker type game using Java in Android S
 - [ ] Appropriate use of inheritance
 - [ ] Appropriate use of Abstract classes
 - [ ] Use of Android API classes/methods (Other than in base code)
-- [ ] Greater than 3 original classes
+- [x] Greater than 3 original classes
 
 #### Functionality
 
@@ -27,8 +27,8 @@ This is my attempt at creating a brick breaker type game using Java in Android S
 
 Game has levels
 
-- [ ] Works
-- [x] Attempted
+- [x] Works
+- [ ] Attempted
 
 Use of standardised data structures (e.g. Lists, Vectors, Collection, Date)
 
